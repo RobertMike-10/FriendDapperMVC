@@ -11,6 +11,24 @@ using System.Threading.Tasks;
 
 namespace WebApplicationDapperMVC
 {
+
+    public class ConnectionService : IConnectionService
+    {
+        private String _connectionString;
+        public ConnectionService(string conn)
+        {
+            _connectionString = conn;
+        }
+        public string GetConnectionString()
+        {
+            return _connectionString;
+        }
+    }
+    public interface IConnectionService
+    {
+        string GetConnectionString();
+    }
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -24,6 +42,9 @@ namespace WebApplicationDapperMVC
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            var connectionString = Configuration.GetConnectionString("FriendConnection");
+            services.AddSingleton<IConnectionService>(s => new ConnectionService(connectionString));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,7 +71,7 @@ namespace WebApplicationDapperMVC
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Friend}/{action=Index}/{id?}");
             });
         }
     }

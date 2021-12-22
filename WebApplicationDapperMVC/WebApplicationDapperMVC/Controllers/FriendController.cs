@@ -56,7 +56,6 @@ namespace WebApplicationDapperMVC.Controllers
             using (IDbConnection db = new SqlConnection(_connectionService.GetConnectionString()))
 
             {
-
                 string sqlQuery = "Insert Into Friends (FriendName,City,PhoneNumber,Age) Values(@FriendName,@City,@PhoneNumber,@Age)";
 
                 int rowsAffected = db.Execute(sqlQuery, new { FriendName = friend.FriendName,
@@ -69,17 +68,37 @@ namespace WebApplicationDapperMVC.Controllers
         // GET: FriendController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Friend friend = new Friend();
+            using (IDbConnection db = new SqlConnection(_connectionService.GetConnectionString()))
+            {
+                friend = db.Query<Friend>("Select * From Friends " +
+                                       "WHERE FriendId =@FriendId", new { FriendId=id }).SingleOrDefault();
+            }
+            return View(friend);
         }
 
         // POST: FriendController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(Friend friend)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                using (IDbConnection db = new SqlConnection(_connectionService.GetConnectionString()))
+                {
+                    string sqlQuery = "update Friends set FriendName=@FriendName,City=@City,PhoneNumber=@PhoneNumber, Age=@Age where friendId=@FriendId";
+
+                    int rowsAffected = db.Execute(sqlQuery, new
+                    {
+                        FriendId = friend.FriendId,
+                        FriendName = friend.FriendName,
+                        City = friend.City,
+                        PhoneNumber = friend.PhoneNumber,
+                        Age = friend.Age
+                    });
+                }
+
+                return RedirectToAction("Index");
             }
             catch
             {

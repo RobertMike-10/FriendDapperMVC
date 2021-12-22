@@ -11,23 +11,8 @@ using System.Threading.Tasks;
 
 namespace WebApplicationDapperMVC
 {
-
-    public class ConnectionService : IConnectionService
-    {
-        private String _connectionString;
-        public ConnectionService(string conn)
-        {
-            _connectionString = conn;
-        }
-        public string GetConnectionString()
-        {
-            return _connectionString;
-        }
-    }
-    public interface IConnectionService
-    {
-        string GetConnectionString();
-    }
+      
+  
 
     public class Startup
     {
@@ -43,7 +28,7 @@ namespace WebApplicationDapperMVC
         {
             services.AddControllersWithViews();
             var connectionString = Configuration.GetConnectionString("FriendConnection");
-            services.AddSingleton<IConnectionService>(s => new ConnectionService(connectionString));
+            services.AddSingleton<IConnectionService, ConnectionService>(s => new ConnectionService(connectionString));
 
         }
 

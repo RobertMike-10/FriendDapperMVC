@@ -12,8 +12,8 @@ namespace WebApplicationDapperMVC.Controllers
     public class FriendController : Controller
     {
 
-        private ConnectionService _connectionService;
-        public FriendController(ConnectionService service)
+        private IConnectionService _connectionService;
+        public FriendController(IConnectionService service)
         {
             _connectionService = service;
         }
@@ -25,7 +25,7 @@ namespace WebApplicationDapperMVC.Controllers
             using (IDbConnection db = new SqlConnection(_connectionService.GetConnectionString()))
             {
 
-                FriendList = db.Query<Friend>("Select * From tblFriends").ToList();
+                FriendList = db.Query<Friend>("Select * From Friends").ToList();
             }
             return View(FriendList);
         }
@@ -33,7 +33,13 @@ namespace WebApplicationDapperMVC.Controllers
         // GET: FriendController/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            Friend friend = new Friend();
+            using (IDbConnection db = new SqlConnection(_connectionService.GetConnectionString()))
+            {
+                friend = db.Query<Friend>("Select * From Friends " +
+                                       "WHERE FriendId = @Id", new { Id = id }).SingleOrDefault();
+            }
+            return View(friend);
         }
 
         // GET: FriendController/Create
@@ -44,17 +50,20 @@ namespace WebApplicationDapperMVC.Controllers
 
         // POST: FriendController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        [ValidateAntiForgeryToken]        
+        public ActionResult Create(Friend friend)
         {
-            try
+            using (IDbConnection db = new SqlConnection(_connectionService.GetConnectionString()))
+
             {
-                return RedirectToAction(nameof(Index));
+
+                string sqlQuery = "Insert Into Friends (FriendName,City,PhoneNumber,Age) Values(@FriendName,@City,@PhoneNumber,@Age)";
+
+                int rowsAffected = db.Execute(sqlQuery, new { FriendName = friend.FriendName,
+                                                              City = friend.City, PhoneNumber= friend.PhoneNumber,
+                                                              Age = friend.Age});
             }
-            catch
-            {
-                return View();
-            }
+            return RedirectToAction("Index");
         }
 
         // GET: FriendController/Edit/5

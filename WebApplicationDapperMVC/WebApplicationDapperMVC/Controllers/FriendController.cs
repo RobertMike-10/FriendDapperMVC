@@ -109,17 +109,28 @@ namespace WebApplicationDapperMVC.Controllers
         // GET: FriendController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            Friend friend = new Friend();
+            using (IDbConnection db = new SqlConnection(_connectionService.GetConnectionString()))
+            {
+                friend = db.Query<Friend>("Select * From Friends " +
+                                       "WHERE FriendID =@FriendId", new { FriendId=id }).SingleOrDefault();
+            }
+            return View(friend);
         }
 
         // POST: FriendController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int FriendId, IFormCollection collection)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                using (IDbConnection db = new SqlConnection(_connectionService.GetConnectionString()))
+                {
+                    string sqlQuery = "Delete From Friends WHERE FriendID = @FriendId";
+                    int rowsAffected = db.Execute(sqlQuery, new { FriendId = FriendId } );
+                }
+                return RedirectToAction("Index");
             }
             catch
             {

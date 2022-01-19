@@ -56,7 +56,8 @@ namespace WebApplicationDapperMVC.Controllers
             using (IDbConnection db = new SqlConnection(_connectionService.GetConnectionString()))
 
             {
-                string sqlQuery = "Insert Into Friends (FriendName,City,PhoneNumber,Age) Values(@FriendName,@City,@PhoneNumber,@Age)";
+                string sqlQuery = "Insert Into Friends " +
+                    "(FriendName,City,PhoneNumber,Age) Values(@FriendName,@City,@PhoneNumber,@Age)";
 
                 int rowsAffected = db.Execute(sqlQuery, new { FriendName = friend.FriendName,
                                                               City = friend.City, PhoneNumber= friend.PhoneNumber,
@@ -86,8 +87,8 @@ namespace WebApplicationDapperMVC.Controllers
             {
                 using (IDbConnection db = new SqlConnection(_connectionService.GetConnectionString()))
                 {
-                    string sqlQuery = "update Friends set FriendName=@FriendName,City=@City,PhoneNumber=@PhoneNumber, Age=@Age where friendId=@FriendId";
-
+                    string sqlQuery = "update Friends set FriendName=@FriendName," +
+                        "City=@City,PhoneNumber=@PhoneNumber, Age=@Age where friendId=@FriendId";
                     int rowsAffected = db.Execute(sqlQuery, new
                     {
                         FriendId = friend.FriendId,
@@ -97,7 +98,6 @@ namespace WebApplicationDapperMVC.Controllers
                         Age = friend.Age
                     });
                 }
-
                 return RedirectToAction("Index");
             }
             catch

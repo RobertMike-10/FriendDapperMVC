@@ -28,7 +28,8 @@ namespace WebApplicationDapperMVC
         {
             services.AddControllersWithViews();
             var connectionString = Configuration.GetConnectionString("FriendConnection");
-            services.AddSingleton<IConnectionService, ConnectionService>(s => new ConnectionService(connectionString));
+            services.AddSingleton<IConnectionService, ConnectionService>(s => 
+                                                                         new ConnectionService(connectionString));
 
         }
 
